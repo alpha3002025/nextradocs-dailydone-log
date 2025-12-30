@@ -1,4 +1,29 @@
-# 이름짓는거 개빡세다...
+# Dailydone 마지막주
+
+
+## 20251230
+### 마크다운 에디터 (green-nextra-markdown-editor)
+- text wrapping ✅
+- quote 버튼 ✅
+- unordered list 버튼 ✅
+- 이미지 업로드/삭제 기능 ✅
+
+
+### 프로젝트 문서화 (dailyfeed)
+- member ✅
+- kafka ✅
+
+
+### Programmers
+- lv2 (수학) 점 찍기 ✅
+- lv2 (수학,이진수,비트마스크,거꾸로 생각하기) 점프와 순간이동 ✅
+- lv2 (string) 조이스틱 ✅
+- lv2 (stack,monotonic stack) 주식 가격 ✅
+- lv2 (simulation, 구현) 주차 요금 계산 ✅
+- lv2 (board (bfs,dfs)) 지게차와 크레인 ✅
+- lv2 (stack,monotonic stack) 짝지어 제거하기 ✅
+- lv2 (string) 최댓값과 최솟값 ✅
+- lv2 (greedy) 최솟값 만들기 ✅
 
 
 
