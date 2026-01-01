@@ -78,6 +78,63 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Post not found' })
 
         fs.writeFileSync(filePath, content)
+
+        // Cleanup unused images
+        try {
+            // Determine the specific image subdirectory for this post
+            let specificImgDir: string;
+
+            // Check if filePath is index file in a directory or a standalone file
+            const fileName = path.basename(filePath);
+            if (fileName === 'index.md' || fileName === 'index.mdx') {
+                // For index files, the "docName" is the directory name
+                const dirName = path.basename(dir);
+                specificImgDir = path.join(imgDir, dirName);
+            } else {
+                // For other files, docName is filename without extension
+                const docName = fileName.replace(/\.(md|mdx)$/, '');
+                specificImgDir = path.join(imgDir, docName);
+            }
+
+            if (fs.existsSync(specificImgDir)) {
+                // Find used images in CURRENT file content
+                const usedImages = new Set<string>();
+
+                // Matches ![] (./img/docName/filename.png) or purely filename if somehow relative
+                // We expect ./img/docName/xxxx.png
+                // We want to capture xxxx.png
+                // The regex needs to handle the path prefix
+                // Regex for standard format: (./img/docName/filename)
+
+                // Construct regex based on docName to be precise? 
+                // Alternatively, just capture the filename at the end of ./img/.../ paths
+                const regex = /img\/[^)]+\/([^/)]+)\)/g;
+
+                let match;
+                while ((match = regex.exec(content)) !== null) {
+                    usedImages.add(match[1]); // match[1] is the filename
+                }
+
+                const allImages = fs.readdirSync(specificImgDir);
+                allImages.forEach(file => {
+                    // Filter only image files to be safe
+                    if (/\.(png|jpg|jpeg|gif|svg|webp)$/i.test(file)) {
+                        if (!usedImages.has(file)) {
+                            // Delete unused
+                            try {
+                                fs.unlinkSync(path.join(specificImgDir, file));
+                                console.log(`Deleted unused image: ${file} from ${specificImgDir}`);
+                            } catch (err) {
+                                console.error(`Failed to delete unused image ${file}`, err);
+                            }
+                        }
+                    }
+                });
+            }
+        } catch (e) {
+            console.error('Failed to cleanup images', e);
+        }
+
         return res.status(200).json({ success: true })
     }
 

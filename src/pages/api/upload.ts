@@ -26,22 +26,44 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (slug === 'home') {
         imgDir = path.join(process.cwd(), 'src/pages/img')
     } else {
-        const postDir = path.join(PAGES_DIR, slug as string)
-        imgDir = path.join(postDir, 'img')
-    }
+        let postDir = path.join(PAGES_DIR, slug as string)
 
-    if (!fs.existsSync(imgDir)) {
-        // Create it if it doesn't exist mainly for home, or new posts
-        // For security, maybe we should check if post dir exists first?
-        // But let's keep it simple as per previous logic which allowed home to create it.
-        // Actually, if it's a new post, the post creation logic should make the dir.
-        // If it's home, we make it.
-        const postDir = slug === 'home' ? PAGES_DIR : path.join(PAGES_DIR, slug as string)
+        // If postDir is not a directory, check if it is a file-based slug
+        let isFile = false;
+        try {
+            if (fs.existsSync(postDir) && fs.statSync(postDir).isFile()) {
+                isFile = true;
+            } else if (!fs.existsSync(postDir)) {
+                // Check for potential file extensions
+                if (fs.existsSync(postDir + '.md') || fs.existsSync(postDir + '.mdx')) {
+                    isFile = true;
+                }
+            }
+        } catch (e) {
+            // ignore error
+        }
 
-        if (fs.existsSync(postDir)) {
-            fs.mkdirSync(imgDir, { recursive: true })
+        if (isFile) {
+            const ext = path.extname(postDir);
+            const name = path.basename(postDir, ext);
+            postDir = path.dirname(postDir);
+            imgDir = path.join(postDir, 'img', name);
         } else {
-            return res.status(404).json({ error: 'Post directory not found' })
+            // For directory-based slugs (index.md), we also want to separate images by the "docName" 
+            // which in this case is the directory name itself.
+            const dirName = path.basename(postDir);
+            imgDir = path.join(postDir, 'img', dirName);
+        }
+
+        // Create imgDir if it doesn't exist
+        if (!fs.existsSync(imgDir)) {
+            // Create recursively
+            try {
+                fs.mkdirSync(imgDir, { recursive: true });
+            } catch (e) {
+                console.error('Failed to create img dir', e);
+                return res.status(500).json({ error: 'Failed to create image directory' });
+            }
         }
     }
 
