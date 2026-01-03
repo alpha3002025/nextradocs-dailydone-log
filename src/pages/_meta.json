@@ -1,3 +1,13 @@
 {
+  "tasks": "Tasks",
+  "dailydone-202512": "daily done (202512)",
+  "dailylog-202512": "daily log (202512)",
+  "dailyworkout-202512": "운동 기록 (202512)",
+  "dailyworkout-202601": "운동 기록 (202601)",
+  "life-memo-ai-prompts": "프롬프트 메모",
+  "memo": "memo",
+  "youtube-funny": "Youtube (웃긴영상)",
+  "youtube-memorable": "Youtube (기억할만한 영상)",
+  "youtube-mental-health": "Youtube (Mental Health)",
   "web-memorable": "web-memorable"
 }
